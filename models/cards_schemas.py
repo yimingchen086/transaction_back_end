@@ -1,7 +1,6 @@
-from pydantic import BaseModel
 
 
-class ConsumptionSchema(BaseModel):
+class ConsumptionSchema:
     amount: int
     store: str
     item: list[str]

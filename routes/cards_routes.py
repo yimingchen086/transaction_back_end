@@ -1,105 +1,92 @@
-from flask import Blueprint, request, jsonify
-from pydantic import ValidationError
-from sqlalchemy.exc import SQLAlchemyError, IntegrityError
-
+from flask import request, jsonify
+from flask_smorest import Blueprint, abort
+from marshmallow import Schema, fields, ValidationError
 from exts import db
 from models.cardInfo import CardInfo
-from models.schemas import CardInfoSchema, CardInfoUpdateSchema, CardInfoCreateSchema  # 匯入 Pydantic Schema
+from models.schemas import CardInfoSchema, CardInfoCreateSchema, CardInfoUpdateSchema
+from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 
-# 建立 Blueprint（名稱為 'cards'，該 Blueprint 對應的 URL 前綴為 '/cards'）
-cards_bp = Blueprint('cards', __name__)
 
-# 取得所有卡片
-@cards_bp.route('/', methods=['GET'])
+
+# 確保 url_prefix 正確設定在 Blueprint
+cards_bp = Blueprint("cards", __name__, url_prefix="/api/cards", description="卡片相關 API")
+
+
+@cards_bp.route("", methods=["GET"])
+@cards_bp.response(200, CardInfoSchema(many=True))
 def get_cards():
+    """取得所有卡片資訊"""
     cards = CardInfo.query.all()
-    cards_data = [CardInfoSchema.model_validate(card).model_dump() for card in cards]
-    return jsonify(cards_data), 200
+    return cards
 
-# 新增信用卡 (POST /api/cards)
-@cards_bp.route('/cards', methods=['POST'])
-def create_card():
+
+@cards_bp.route('', methods=['POST'])
+@cards_bp.arguments(CardInfoCreateSchema)
+@cards_bp.response(201, CardInfoSchema)
+def create_card(card_data):
+    """新增信用卡 (POST /api/cards)"""
     try:
-        card_data = CardInfoCreateSchema.model_validate(request.json)
-        # 建立新的 CardInfo 物件
-        new_card = CardInfo(
-            card_name=card_data.card_name,
-            bank=card_data.bank,
-            maxconsume=card_data.maxconsume,
-            curramount=card_data.curramount,
-            description=card_data.description,
-            store=card_data.store,
-            rewardstype=card_data.rewardstype,
-            daterange_start=card_data.daterange_start,
-            daterange_end=card_data.daterange_end,
-            postingdate=card_data.postingdate
-        )
+        new_card = CardInfo(**card_data)
         db.session.add(new_card)
         db.session.commit()
-        return jsonify(new_card.to_dict()), 201  # 201 Created
-
-    except ValidationError as e:
-        return jsonify({"error": "Invalid data", "details": e.errors()}), 400  # 400 Bad Request
+        return new_card
     except IntegrityError:
-        db.session.rollback()  # 回滾避免影響資料庫
-        return jsonify({"error": "Database integrity error"}), 400  # 400 Bad Request
+        db.session.rollback()
+        abort(400, message="資料庫完整性錯誤，請確認輸入資料是否唯一")
     except Exception as e:
-        return jsonify({"error": "Internal server error", "details": str(e)}), 500  # 500 Internal Server Error
+        abort(500, message=f"內部伺服器錯誤: {str(e)}")
 
-
-#修改信用卡 (PUT /api/cards/<card_id>)
 @cards_bp.route('/<int:card_id>', methods=['PUT'])
-def update_card(card_id):
+@cards_bp.arguments(CardInfoUpdateSchema)
+def update_card(updated_data, card_id):
+    """更新信用卡資訊 (PUT /api/cards/<card_id>)"""
     card = CardInfo.query.get(card_id)
 
     if not card:
-        return jsonify({"error": "Card not found", "message": f"Card with ID {card_id} does not exist"}), 404
+        abort(404, message=f"Card with ID {card_id} not found")
 
     try:
-        # 驗證請求數據
-        data = request.get_json()
-        validated_data = CardInfoUpdateSchema.model_validate(data).model_dump(exclude_unset=True)  # Pydantic v2 驗證
-        # 更新欄位（只更新提供的欄位）
-        for key, value in validated_data.items():
+        for key, value in updated_data.items():
             setattr(card, key, value)
+            db.session.commit()
+            return CardInfoUpdateSchema().dump(card), 200
 
-        db.session.commit()
-        return jsonify(CardInfoUpdateSchema.model_validate(card).model_dump()), 200  # 轉換為 JSON 格式返回
-    except ValidationError as e:
-        return jsonify({"error": "Validation failed", "details": e.errors()}), 400  # 400 Bad Request
     except SQLAlchemyError:
         db.session.rollback()
-        return jsonify({"error": "Database error"}), 500  # 500 Internal Server Error
-
-@cards_bp.route('/api/cards/<int:card_id>', methods=['DELETE'])
-def delete_card(card_id):
-    try:
-        card = CardInfo.query.get(card_id)
-
-        if not card:
-            return jsonify({"error": "Card not found"}), 404  # 404 Not Found
-
-        db.session.delete(card)
-        db.session.commit()
-
-        return jsonify({"message": "Card deleted successfully"}), 200  # 200 OK
-
-    except IntegrityError:
-        db.session.rollback()  # 回滾資料庫
-        return jsonify({"error": "Cannot delete card due to database constraints"}), 400  # 400 Bad Request
-
-    except Exception as e:
-        return jsonify({"error": "Internal server error", "details": str(e)}), 500  # 500 Internal Server Error
+        abort(500, message="Database error")  # 500: 資料庫錯誤
 
 
 
-#取得單一卡片 (GET /api/cards/<card_id>)
-@cards_bp.route('/<int:card_id>', methods=['GET'])
-def get_card(card_id):
-    card = CardInfo.query.get(card_id)
-
-    if not card:
-        return jsonify({"error": "Card not found", "message": f"Card with ID {card_id} does not exist"}), 404
-
-    card_data = CardInfoSchema.model_validate(card).model_dump()  # Pydantic v2 轉換
-    return jsonify(card_data), 200  # 200 OK
+#
+# @cards_bp.route('/api/cards/<int:card_id>', methods=['DELETE'])
+# def delete_card(card_id):
+#     try:
+#         card = CardInfo.query.get(card_id)
+#
+#         if not card:
+#             return jsonify({"error": "Card not found"}), 404  # 404 Not Found
+#
+#         db.session.delete(card)
+#         db.session.commit()
+#
+#         return jsonify({"message": "Card deleted successfully"}), 200  # 200 OK
+#
+#     except IntegrityError:
+#         db.session.rollback()  # 回滾資料庫
+#         return jsonify({"error": "Cannot delete card due to database constraints"}), 400  # 400 Bad Request
+#
+#     except Exception as e:
+#         return jsonify({"error": "Internal server error", "details": str(e)}), 500  # 500 Internal Server Error
+#
+#
+#
+# #取得單一卡片 (GET /api/cards/<card_id>)
+# @cards_bp.route('/<int:card_id>', methods=['GET'])
+# def get_card(card_id):
+#     card = CardInfo.query.get(card_id)
+#
+#     if not card:
+#         return jsonify({"error": "Card not found", "message": f"Card with ID {card_id} does not exist"}), 404
+#
+#     card_data = CardInfoSchema.model_validate(card).model_dump()  # Pydantic v2 轉換
+#     return jsonify(card_data), 200  # 200 OK

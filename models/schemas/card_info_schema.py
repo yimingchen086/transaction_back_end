@@ -1,20 +1,16 @@
-from pydantic import BaseModel, Field, ConfigDict
-from datetime import date
-from typing import Optional
+from marshmallow import Schema, fields
 
 
-class CardInfoSchema(BaseModel):
+class CardInfoSchema(Schema):
     card_id: int
-    card_name: str = Field(..., max_length=50)
-    bank: str = Field(..., max_length=50)
-    maxconsume: Optional[int] = None
-    curramount: Optional[int] = None
-    description: Optional[str] = None
-    store: Optional[str] = None
-    rewardstype: Optional[str] = None
-    daterange_start: Optional[date] = None
-    daterange_end: Optional[date] = None
-    postingdate: Optional[str] = None
-
-    model_config = ConfigDict(from_attributes=True)
+    card_name = fields.Str(required=True, validate=lambda x: len(x) <= 50)
+    bank = fields.Str(required=True, validate=lambda x: len(x) <= 50)
+    maxconsume = fields.Int(allow_none=True)
+    curramount = fields.Int(allow_none=True)
+    description = fields.Str(allow_none=True)
+    store = fields.Str(allow_none=True)
+    rewardstype = fields.Str(allow_none=True)
+    daterange_start = fields.Date(allow_none=True)
+    daterange_end = fields.Date(allow_none=True)
+    postingdate = fields.Str(allow_none=True)
 

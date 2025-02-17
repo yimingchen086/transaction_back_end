@@ -1,17 +1,14 @@
-from pydantic import BaseModel, Field, ConfigDict
-from datetime import date
-from typing import Optional
+from marshmallow import Schema, fields
 
-class CardInfoCreateSchema(BaseModel):
-    card_name: str = Field(..., max_length=50)
-    bank: str = Field(..., max_length=50)
-    maxconsume: Optional[int] = None
-    curramount: Optional[int] = None
-    description: Optional[str] = None
-    store: Optional[str] = None
-    rewardstype: Optional[str] = None
-    daterange_start: Optional[date] = None  # 自動轉換日期格式
-    daterange_end: Optional[date] = None  # 自動轉換日期格式
-    postingdate: Optional[str] = None
 
-    model_config = ConfigDict(from_attributes=True)  # 讓 Pydantic 能處理 ORM
+class CardInfoCreateSchema(Schema):
+    card_name = fields.String(required=True)
+    bank = fields.String(required=True)
+    maxconsume = fields.Integer(required=False, allow_none=True)
+    curramount = fields.Integer(required=False, allow_none=True)
+    description = fields.String(required=False, allow_none=True)
+    store = fields.String(required=False, allow_none=True)
+    rewardstype = fields.String(required=False, allow_none=True)
+    daterange_start = fields.Date(required=False, allow_none=True)
+    daterange_end = fields.Date(required=False, allow_none=True)
+    postingdate = fields.String(required=False, allow_none=True)
