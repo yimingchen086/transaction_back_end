@@ -1,18 +1,16 @@
 import config
 from exts import db
 from flask_migrate import Migrate
-from models import CardInfo
-from flask import Flask, request, jsonify
+from flask import Flask
 from flask_cors import CORS
 from routes import register_blueprints
-from flask_smorest import Api, Blueprint
-from marshmallow import Schema, fields
-
+from flask_smorest import Api
 
 
 app = Flask(__name__)
-CORS(app, origins=["http://localhost:5173"])
-# CORS(app, origins=["http://localhost:5173", "*"], supports_credentials=True)
+# CORS(app, origins=["http://localhost:5173"])
+CORS(app, origins=["http://localhost:5173", "*"], supports_credentials=True)
+# CORS(app)
 
 app.config['DEBUG'] = True
 app.config.from_object(config)
@@ -36,6 +34,7 @@ register_blueprints(api)
 
 if __name__ == "__main__":
     app.run()
+    # app.run(host="127.0.0.1", port=5000, debug=True)
 
 
 # # 紀錄消費
