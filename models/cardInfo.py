@@ -2,7 +2,7 @@ from exts import db
 
 
 class CardInfo(db.Model):
-    __tablename__ = 'cards_info'
+    __tablename__ = 'credit_card'
     card_id = db.Column(db.Integer, primary_key=True)  # 卡片id 主鍵
     card_name = db.Column(db.String(50), nullable=False)  # 卡片名稱
     bank = db.Column(db.String(50), nullable=False)  # 發卡銀行
