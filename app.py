@@ -9,8 +9,10 @@ from flask_smorest import Api
 
 app = Flask(__name__)
 # CORS(app, origins=["http://localhost:5173"])
-CORS(app, origins=["http://localhost:5173", "*"], supports_credentials=True)
-# CORS(app)
+# CORS(app, origins=["http://localhost:5173", "*"], supports_credentials=True)
+# CORS(app, resources={r"/*": {"origins": "*"}}, supports_credentials=True)
+CORS(app)
+
 
 app.config['DEBUG'] = True
 app.config.from_object(config)
