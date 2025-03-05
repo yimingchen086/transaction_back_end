@@ -1,7 +1,7 @@
 import config
 from exts import db
 from flask_migrate import Migrate
-from flask import Flask, render_template
+from flask import Flask, render_template, jsonify, make_response
 from flask_cors import CORS
 from routes import register_blueprints
 from flask_smorest import Api

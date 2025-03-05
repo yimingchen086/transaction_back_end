@@ -1,9 +1,10 @@
 from flask_smorest import Blueprint, abort
 from exts import db
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
-
-from models.schemas import TransactionCreateSchema, TransactionSchema, TransactionUpdateSchema
+from flask import abort, request
+from models.schemas import TransactionCreateSchema, TransactionSchema, TransactionUpdateSchema, RecentTransactionsQuerySchema
 from models.transaction_db import Transaction
+from marshmallow import fields
 
 
 # 確保 url_prefix 正確設定在 Blueprint
@@ -99,4 +100,23 @@ def delete_transaction(transaction_id):
         abort(400, message="資料庫完整性錯誤，無法刪除交易")
     except Exception as e:
         db.session.rollback()
+        abort(500, message=f"內部伺服器錯誤: {str(e)}")
+
+
+@transaction_bp.route("/recent", methods=['GET'])
+@transaction_bp.arguments(RecentTransactionsQuerySchema, location="query")
+@transaction_bp.response(200, TransactionSchema(many=True))
+def get_recent_transactions(args):
+    """根據查詢參數 take 獲取最近的交易紀錄"""
+    try:
+        print(args)
+        take = args["take"]
+
+        if take <= 0:
+            abort(400, message="參數 take 必須是正整數")
+
+        transactions = Transaction.query.order_by(Transaction.transaction_id.desc()).limit(take).all()
+
+        return transactions
+    except Exception as e:
         abort(500, message=f"內部伺服器錯誤: {str(e)}")

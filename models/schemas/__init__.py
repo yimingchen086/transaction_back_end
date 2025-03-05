@@ -7,6 +7,7 @@ from .transaction_schema import TransactionSchema
 from .transaction_update_schema import TransactionUpdateSchema
 from .transaction_create_schema import TransactionCreateSchema
 from .transaction_method_schema import TransactionMethodSchema
+from .recent_transaction_query_schema import RecentTransactionsQuerySchema
 
 SCHEMA_CATEGORIES = {
     "cards": ["CardInfoSchema", "CardInfoUpdateSchema", "CardInfoCreateSchema"],
