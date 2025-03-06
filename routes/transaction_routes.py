@@ -1,10 +1,8 @@
 from flask_smorest import Blueprint, abort
 from exts import db
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
-from flask import abort, request
 from models.schemas import TransactionCreateSchema, TransactionSchema, TransactionUpdateSchema, RecentTransactionsQuerySchema
 from models.transaction_db import Transaction
-from marshmallow import fields
 
 
 # 確保 url_prefix 正確設定在 Blueprint
