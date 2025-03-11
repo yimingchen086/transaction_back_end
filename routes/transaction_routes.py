@@ -3,6 +3,9 @@ from exts import db
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from models.schemas import TransactionCreateSchema, TransactionSchema, TransactionUpdateSchema, RecentTransactionsQuerySchema
 from models.transaction_db import Transaction
+import json
+import traceback
+from decimal import Decimal
 
 
 # 確保 url_prefix 正確設定在 Blueprint
@@ -12,7 +15,7 @@ transaction_bp = Blueprint("transaction", __name__, url_prefix="/api/transaction
 
 @transaction_bp.route("", methods=['POST'])
 @transaction_bp.arguments(TransactionCreateSchema)
-@transaction_bp.response(201, TransactionSchema)
+@transaction_bp.response(201, TransactionCreateSchema)
 def create_transaction(transaction_data):
     """新增一筆交易紀錄"""
     try:
@@ -22,8 +25,11 @@ def create_transaction(transaction_data):
         return new_transaction
     except IntegrityError:
         db.session.rollback()
+        print(traceback.format_exc())  # 顯示完整錯誤
         abort(400, message="資料庫完整性錯誤，請檢查 transaction_method_id、category_id 或 card_id 是否存在")
     except Exception as e:
+        print("❌ 交易建立失敗:", str(e))
+        print(traceback.format_exc())  # 顯示完整錯誤
         abort(500, message=f"內部伺服器錯誤: {str(e)}")
 
 

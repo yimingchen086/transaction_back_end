@@ -14,6 +14,7 @@ class Transaction(db.Model):
     transaction_time = db.Column(db.DateTime(timezone=True))  # 交易時間
     create_time = db.Column(db.DateTime(timezone=True), default=datetime.utcnow)  # 創建時間，默認為當前時間
     card_id = db.Column(db.Integer, db.ForeignKey('credit_card.card_id'), nullable=False)  # 卡片ID，外鍵
+    store =  db.Column(db.String(50), nullable=False)
 
     # 定義外鍵關係
     transaction_method = db.relationship('TransactionMethod', backref='transactions')

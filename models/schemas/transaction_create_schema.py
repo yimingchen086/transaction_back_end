@@ -29,6 +29,24 @@ class TransactionCreateSchema(Schema):
     )
     card_id = fields.Integer(
         required=True,
+        allow_none=True,
         validate=validate.Range(min=1),
         description="信用卡資料ID"
     )
+    store = fields.String(
+        required=True,
+        validate=validate.Length(min=1, max=50),
+        description="消費商店"
+    )
+
+    class Meta:
+        fields = (
+            'transaction_method_id',
+            'transaction_title',
+            'amount',
+            'category_id',
+            'transaction_time',
+            'card_id',
+            'store'
+        )
+        ordered = True  # 保持欄位順序
