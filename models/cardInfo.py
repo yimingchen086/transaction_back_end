@@ -7,7 +7,6 @@ class CardInfo(db.Model):
     card_name = db.Column(db.String(50), nullable=False)  # 卡片名稱
     bank = db.Column(db.String(50), nullable=False)  # 發卡銀行
     maxconsume = db.Column(db.Integer, nullable=True)  # 最大消費額度
-    curramount = db.Column(db.Integer, nullable=True)  # 目前消費金額
     description = db.Column(db.Text, nullable=True)  # 描述
     store = db.Column(db.Text, nullable=True)  # 適用商店
     rewardstype = db.Column(db.String(50), nullable=True)  # 獎勵類型

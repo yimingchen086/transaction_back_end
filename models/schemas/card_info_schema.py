@@ -6,7 +6,6 @@ class CardInfoSchema(Schema):
     card_name = fields.Str(required=True, validate=lambda x: len(x) <= 50)
     bank = fields.Str(required=True, validate=lambda x: len(x) <= 50)
     maxconsume = fields.Int(allow_none=True)
-    curramount = fields.Int(allow_none=True)
     description = fields.Str(allow_none=True)
     store = fields.Str(allow_none=True)
     rewardstype = fields.Str(allow_none=True)

@@ -38,6 +38,11 @@ class TransactionCreateSchema(Schema):
         validate=validate.Length(min=1, max=50),
         description="消費商店"
     )
+    actual_amount = fields.Integer(
+        validate=validate.Range(min=0),
+        description="實際金額",
+        default=0
+    )
 
     class Meta:
         fields = (
@@ -47,6 +52,7 @@ class TransactionCreateSchema(Schema):
             'category_id',
             'transaction_time',
             'card_id',
-            'store'
+            'store',
+            'actual_amount'
         )
         ordered = True  # 保持欄位順序

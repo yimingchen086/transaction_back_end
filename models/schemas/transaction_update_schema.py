@@ -1,4 +1,5 @@
-from marshmallow import Schema, fields
+from marshmallow import Schema, fields, validate
+
 
 class TransactionUpdateSchema(Schema):
     transaction_method_id = fields.Int(required=False)
@@ -7,3 +8,4 @@ class TransactionUpdateSchema(Schema):
     category_id = fields.Int(required=False)
     card_id = fields.Int(required=False)
     transaction_time = fields.DateTime(format='%Y-%m-%dT%H:%M:%S%z', required=False)
+    actual_amount = fields.Integer(default=0, validate=validate.Range(min=0),)

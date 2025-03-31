@@ -5,7 +5,6 @@ class CardInfoUpdateSchema(Schema):
     card_name = fields.String()
     bank = fields.String()
     maxconsume = fields.Integer()
-    curramount = fields.Integer()
     description = fields.String(allow_none=True)
     store = fields.String(allow_none=True)
     rewardstype = fields.String(allow_none=True)

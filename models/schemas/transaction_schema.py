@@ -38,6 +38,10 @@ class TransactionSchema(Schema):
         required=True,
         description="信用卡資料的ID"
     )
+    actual_amount = fields.Integer(
+        required=False,
+        description='實際金額'
+    )
 
 
     # 外鍵關係的嵌套序列化（可選）
@@ -57,6 +61,7 @@ class TransactionSchema(Schema):
             'card_id',
             'transaction_method',
             'category',
-            'card'
+            'card',
+            'actual_amount'
         )
         ordered = True  # 保持欄位順序
