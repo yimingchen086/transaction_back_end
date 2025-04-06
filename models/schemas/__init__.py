@@ -8,13 +8,16 @@ from .transaction_update_schema import TransactionUpdateSchema
 from .transaction_create_schema import TransactionCreateSchema
 from .transaction_method_schema import TransactionMethodSchema
 from .recent_transaction_query_schema import RecentTransactionsQuerySchema
+from .login_google_schema import LoginGoogleSchema, GoogleUserSchema
 
 SCHEMA_CATEGORIES = {
     "cards": ["CardInfoSchema", "CardInfoUpdateSchema", "CardInfoCreateSchema"],
-    "category": ["CategorySchema"]
+    "category": ["CategorySchema"],
+    "account": ["LoginGoogleSchema", "GoogleUserSchema"]
 }
 
 __all__ = [
     *SCHEMA_CATEGORIES["cards"],
-    *SCHEMA_CATEGORIES["category"]
+    *SCHEMA_CATEGORIES["category"],
+    *SCHEMA_CATEGORIES["account"]
 ]

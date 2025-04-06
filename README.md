@@ -13,4 +13,7 @@ pip install -r requirements.txt
 更新
 pip freeze > requirements.txt
 
+要新建.env放
+GOOGLE_CLIENT_ID
+
 

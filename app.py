@@ -11,7 +11,8 @@ app = Flask(__name__)
 # CORS(app, origins=["http://localhost:5173"])
 # CORS(app, origins=["http://localhost:5173", "*"], supports_credentials=True)
 # CORS(app, resources={r"/*": {"origins": "*"}}, supports_credentials=True)
-CORS(app)
+CORS(app, supports_credentials=True, origins="*")  # origins 你可以指定前端的網址
+# CORS(app)
 
 
 app.config['DEBUG'] = True
